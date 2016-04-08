@@ -1,0 +1,24 @@
+# TODO: turn into a shell script with error checking, etc.
+
+# Loosely based on https://github.com/jordansissel/fpm/wiki/PackageMakeInstall#package-up-the-nodejs-runtime
+mkdir ruby;
+cd ruby;
+# https://www.ruby-lang.org/en/downloads/
+wget https://cache.ruby-lang.org/pub/ruby/2.1/ruby-2.1.9.tar.gz;
+$RUBY_SHA="ba5ba60e5f1aa21b4ef8e9bf35b9ddb57286cb546aac4b5a28c71f459467e507"
+sha256sum ruby-2.1.9.tar.gz;
+tar xvf ruby-2.1.9.tar.gz;
+cd ruby-2.1.9;
+./configure --prefix=/usr;
+make;
+mkdir ../../rubyinstall;
+make install DESTDIR=../../rubyinstall;
+fpm -s dir -t deb -n ruby -v 2.1.9 -C ../../rubyinstall -p ../../created_packages/ruby_VERSION_ARCH.deb -d "libssl0.9.8 > 0" -d "libstdc++6 >= 4.4.3" usr/bin usr/lib;
+cd ../../created_packages;
+
+# remove 1.9.1*
+sudo apt-get remove ruby;
+sudo apt-get install libssl0.9.8;
+sudo dpkg -i ruby_2.1.9_amd64.deb;
+
+
